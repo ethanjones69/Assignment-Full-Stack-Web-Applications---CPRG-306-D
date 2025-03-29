@@ -5,33 +5,32 @@ export const POST = async (request) => {
   try {
     const body = await request.json();
     const { title, actors, releaseYear } = body;
-    const actorsArray = Array.isArray(actors) ? actors : [actors];
 
     const movie = await client.movie.create({
       data: {
         title,
-        actors: actorsArray,
-        releaseYear: Number.parseInt(releaseYear),
+        actors: Array.isArray(actors) ? actors : [actors],
+        releaseYear: Number(releaseYear),
       },
     });
-    return NextResponse.json(movie);
+
+    return NextResponse.json(movie, { status: 201 });
   } catch (error) {
-    console.error("Error creating movie:", error);
     return NextResponse.json(
-      { error: "Failed to create movie", details: error.message },
+      { error: "Failed to create movie" },
       { status: 500 }
     );
   }
 };
 
-export const GET = async (request) => {
+export const GET = async () => {
   try {
     const movies = await client.movie.findMany();
     return NextResponse.json(movies);
   } catch (error) {
     return NextResponse.json(
-      { status: 500 },
-      { error: "Failed to fetch movies" }
+      { error: "Failed to fetch movies" },
+      { status: 500 }
     );
   }
 };
